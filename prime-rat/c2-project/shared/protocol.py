@@ -25,25 +25,29 @@ class Protocol:
             # Read the 4-byte header to get the payload length
             header_bytes = sock.recv(4)
             if not header_bytes:
-                # This indicates the other side has closed the connection
-                return None
+                return None # Connection closed
             
+            return Protocol.unpack_message_from_header(header_bytes, sock)
+
+        except (struct.error, json.JSONDecodeError, ConnectionError):
+            return None
+
+    @staticmethod
+    def unpack_message_from_header(header_bytes: bytes, sock) -> dict | None:
+        """Unpacks a message given that the header has already been read."""
+        try:
             payload_len = struct.unpack('>I', header_bytes)[0]
             
-            # Read the full payload, handling potential fragmentation
             payload_bytes = b''
             bytes_to_read = payload_len
             while len(payload_bytes) < payload_len:
-                # It's crucial to loop as recv might not get all data at once
                 packet = sock.recv(bytes_to_read)
                 if not packet:
-                    # Connection lost unexpectedly during payload read
-                    return None
+                    return None # Connection lost
                 payload_bytes += packet
                 bytes_to_read -= len(packet)
 
             return json.loads(payload_bytes.decode('utf-8'))
         
         except (struct.error, json.JSONDecodeError, ConnectionError):
-            # Any error during unpacking means the stream is corrupt or closed
             return None

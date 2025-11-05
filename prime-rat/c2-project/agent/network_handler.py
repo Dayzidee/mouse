@@ -2,6 +2,7 @@ import socket
 import ssl
 import time
 import threading
+import uuid
 from queue import Queue, Empty
 
 # Import our custom components
@@ -18,9 +19,10 @@ class AgentNetworkHandler:
         self.sock = None
         self.is_connected = False
         self.shutdown_event = threading.Event()
+        self.agent_id = f"agent_{uuid.uuid4().hex[:8]}"
 
     def _connect(self):
-        """Handles the persistent connection logic (Option A)."""
+        """Handles the persistent connection logic."""
         while not self.shutdown_event.is_set():
             try:
                 print(f"[*] Attempting to connect to {self.host}:{self.port}...")
@@ -34,6 +36,11 @@ class AgentNetworkHandler:
                 
                 print("[+] Successfully connected to the server.")
                 self.is_connected = True
+
+                # Identify with the server
+                id_message = {"type": "ID_AGENT", "agent_id": self.agent_id}
+                self.sock.sendall(Protocol.pack_message(id_message))
+                print(f"[*] Identified to server as {self.agent_id}")
                 return
             except (ConnectionRefusedError, socket.gaierror, ssl.SSLError, OSError) as e:
                 print(f"[!] Connection failed: {e}. Retrying in {self.reconnect_delay} seconds.")
