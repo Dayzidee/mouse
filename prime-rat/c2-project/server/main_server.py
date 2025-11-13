@@ -19,7 +19,10 @@ if __name__ == '__main__':
         try:
             while not controller_command_queue.empty():
                 cmd_data = controller_command_queue.get_nowait()
-                controller.send_command_to_agent(cmd_data['command'])
+                agent_id = cmd_data.get('agent_id')
+                command = cmd_data.get('command')
+                if agent_id and command:
+                    controller.send_command_to_agent(agent_id, command)
                 controller_command_queue.task_done()
         finally:
             root.after(100, process_controller_commands)
