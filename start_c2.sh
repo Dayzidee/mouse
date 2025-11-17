@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Define paths relative to the script's location
-SCRIPT_DIR=$(dirname "$0")
+SCRIPT_DIR=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &> /dev/null && pwd)
 SERVER_DIR="$SCRIPT_DIR/prime-rat/c2-project/server"
 AGENT_DIR="$SCRIPT_DIR/prime-rat/c2-project/agent"
 SERVER_MAIN="$SERVER_DIR/main_server.py"
