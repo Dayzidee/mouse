@@ -48,7 +48,7 @@ class ServerNetworkHandler:
         if not self.client_socket:
             print("[Network] No active connection")
             return
-            
+
         print("[Network] Listening for agent messages...")
         while not self.shutdown_event.is_set():
             try:

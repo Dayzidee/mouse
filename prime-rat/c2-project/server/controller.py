@@ -33,7 +33,7 @@ class AppController:
             try:
                 message = self.receive_queue.get(timeout=1)
                 msg_type = message.get('type')
-                
+
                 if msg_type == 'SYSTEM':
                     payload = message.get('payload')
                     if payload == 'AGENT_CONNECTED':
@@ -52,7 +52,7 @@ class AppController:
 
                 token = message.get('token')
                 payload = message.get('payload', 'No payload received.')
-                
+
                 if token and token in self.in_flight_commands:
                     command_details = self.in_flight_commands[token]
                     
